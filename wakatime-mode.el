@@ -173,6 +173,9 @@ the wakatime subprocess occurs."
   (let*
     (
       (command (wakatime-client-command savep))
+      (coding-system-for-read
+       (unless (eq coding-system-for-read 'auto-save-coding)
+       coding-system-for-read))
       (process
         (start-process
           "Shell"
@@ -211,16 +214,12 @@ the wakatime subprocess occurs."
 
 (defun wakatime-ping ()
   "Send ping notice to WakaTime."
-  (when (and
-         (buffer-file-name (current-buffer))
-         (not (auto-save-file-name-p (buffer-file-name (current-buffer)))))
+  (when (buffer-file-name (current-buffer))
     (wakatime-call nil)))
 
 (defun wakatime-save ()
   "Send save notice to WakaTime."
-  (when (and
-         (buffer-file-name (current-buffer))
-         (not (auto-save-file-name-p (buffer-file-name (current-buffer)))))
+  (when (buffer-file-name (current-buffer))
     (wakatime-call t)))
 
 (defun wakatime-bind-hooks ()
