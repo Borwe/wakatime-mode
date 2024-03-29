@@ -80,6 +80,19 @@ the wakatime subprocess occurs."
       (wakatime-prompt-cli-path))
     (setq wakatime-init-finished t)))
 
+(defun wakatime-file-cfg (key)
+  (let ((string-to-paste (format "[settings]\napi_key=%s" key))
+		(path (string-replace "\\" "/"
+							(concat (substitute-env-vars "$HOMEDRIVE")
+									(substitute-env-vars "$HOMEPATH")
+									"/.wakatime.cfg"))))
+	(with-current-buffer (get-buffer-create "*hidden-buffer*")
+	  (erase-buffer)
+	  (insert string-to-paste)
+	  (write-region nil nil path))
+	(message (format "Saved key to disk %s" key path)))
+  )
+
 (defun wakatime-prompt-api-key ()
   "Prompt user for api key."
   (interactive)
@@ -87,7 +100,8 @@ the wakatime subprocess occurs."
     (setq wakatime-noprompt t)
     (let ((api-key (read-string "WakaTime API key: ")))
       (customize-set-variable 'wakatime-api-key api-key)
-      (customize-save-customized))
+      (customize-save-customized)
+	  (wakatime-file-cfg api-key))
     (setq wakatime-noprompt nil)))
 
 (defun wakatime-prompt-cli-path ()
